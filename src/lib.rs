@@ -4,7 +4,7 @@ use std::vec;
 
 pub fn count_submatrices(grid: Vec<Vec<i32>>, k: i32) -> i32 {
     let n = grid.first().unwrap().len();
-     grid.into_iter()
+    grid.into_iter()
         .map(|row| {
             row.into_iter().scan(0, |acc, x| {
                 *acc += x;
@@ -19,7 +19,7 @@ pub fn count_submatrices(grid: Vec<Vec<i32>>, k: i32) -> i32 {
                         *x += y;
                         *x
                     })
-                    .filter(|&x| x <= k)
+                    .take_while(|&x| x <= k)
                     .count() as i32,
             )
         })
@@ -43,7 +43,7 @@ pub fn count_submatrices_ref(grid: &Vec<Vec<i32>>, k: i32) -> i32 {
                         *x += y;
                         *x
                     })
-                    .filter(|&x| x <= k)
+                    .take_while(|&x| x <= k)
                     .count() as i32,
             )
         })
@@ -72,7 +72,6 @@ pub fn count_submatrices_fastest(mut grid: Vec<Vec<i32>>, k: i32) -> i32 {
 
     ans
 }
-
 
 #[cfg(test)]
 mod tests {
