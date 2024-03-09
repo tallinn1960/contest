@@ -2,23 +2,29 @@
 
 use contest::{count_submatrices, count_submatrices_fastest, count_submatrices_ref};
 use criterion::{criterion_group, criterion_main, Criterion};
+use rand::distributions::Distribution;
 
 fn count_submatrices_benchmark(c: &mut Criterion) {
-    // create an 1200 * 1400 grid with random positive i32 numbers
+    // create an 1000 * 1000 grid with random positive i32 numbers in the range
+    // 0..1000
 
     let mut grid = vec![];
-    let k = i32::MAX / 2; // let's use a big number to make the benchmark more interesting
+    let k = 500000000; // let's use a big number to make the benchmark more interesting
+    let rng = rand::thread_rng();
+    let mut generator = rand::distributions::Uniform::new(0, 1000).sample_iter(rng);
 
-    (0..1200).for_each(|_| {
+    (0..500).for_each(|_| {
         grid.push(
-            (0..1400)
-                .map(|_| rand::random::<i32>().abs() / 10000)
+            (0..500)
+                .map(|_| generator.next().unwrap())
                 .collect::<Vec<_>>(),
         );
     });
 
+    // the input data is maxed to half the limits on each input according to leetcode constraints
+
     let mut group = c.benchmark_group("count_submatrices");
-    group.measurement_time(std::time::Duration::from_secs(6));
+    group.measurement_time(std::time::Duration::from_secs(20));
 
     group.bench_function("count_submatrices", |b| {
         b.iter_batched(
