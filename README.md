@@ -79,3 +79,50 @@ consuming their input are twice as fast on Linux then they are on macOS - on
 the same hardware.
 
 **Why is that?**
+
+Turned out that execution times in the ns/µs range aren't reliable numbers given
+by Criterion. Increasing the datasize to take execution times into the ms
+range gave a consistent performance on both platforms. Thanks to *Patryk27* on Reddit 
+for helping me out.
+
+New numbers for the 1200 * 1400 grid:
+
+Linux:
+
+```
+     Running benches/contest.rs (target/release/deps/contest-f7ac2a65a880bfe2)
+count_submatrices       time:   [1.2586 ms 1.2669 ms 1.2775 ms]
+Found 5 outliers among 100 measurements (5.00%)
+  3 (3.00%) high mild
+  2 (2.00%) high severe
+
+count_submatrices_ref   time:   [852.14 µs 855.31 µs 859.13 µs]
+Found 16 outliers among 100 measurements (16.00%)
+  2 (2.00%) high mild
+  14 (14.00%) high severe
+
+count_submatrices_fastest
+                        time:   [3.6994 ms 3.7125 ms 3.7298 ms]
+Found 2 outliers among 100 measurements (2.00%)
+  2 (2.00%) high severe
+```
+
+macOS:
+```
+     Running benches/contest.rs (target/release/deps/contest-aa990af907917799)
+count_submatrices       time:   [1.1919 ms 1.1996 ms 1.2079 ms]
+Found 21 outliers among 100 measurements (21.00%)
+  10 (10.00%) high mild
+  11 (11.00%) high severe
+
+count_submatrices_ref   time:   [831.70 µs 834.80 µs 838.67 µs]
+Found 7 outliers among 100 measurements (7.00%)
+  6 (6.00%) high mild
+  1 (1.00%) high severe
+
+count_submatrices_fastest
+                        time:   [3.5782 ms 3.5854 ms 3.5940 ms]
+Found 3 outliers among 100 measurements (3.00%)
+  2 (2.00%) high mild
+  1 (1.00%) high severe
+```
