@@ -23,20 +23,20 @@ fn count_submatrices_benchmark(c: &mut Criterion) {
 
     // the input data is maxed to half the limits on each input according to leetcode constraints
 
-    let mut group = c.benchmark_group("count_submatrices");
+    let mut group = c.benchmark_group("all");
     group.measurement_time(std::time::Duration::from_secs(20));
 
-    group.bench_function("count_submatrices", |b| {
+    group.bench_function("mine/cs", |b| {
         b.iter_batched(
             || grid.clone(),
             |t| count_submatrices(t, k),
             criterion::BatchSize::SmallInput,
         )
     });
-    group.bench_function("count_submatrices_ref", |b| {
+    group.bench_function("mine/ref", |b| {
         b.iter(|| count_submatrices_ref(&grid, k))
     });
-    group.bench_function("count_submatrices_fastest", |b| {
+    group.bench_function("leetcode/cs", |b| {
         b.iter_batched(
             || grid.clone(),
             |t| count_submatrices_fastest(t, k),
