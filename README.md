@@ -126,3 +126,15 @@ Found 3 outliers among 100 measurements (3.00%)
   2 (2.00%) high mild
   1 (1.00%) high severe
 ```
+
+# Acknowledgements
+
+- *Patryk27* on Reddit
+- *dacozai* on *leetcode* for the implementation of `compute_submatrices_fastest` 
+I took as a challenge to beat.
+
+# Addendum
+
+The most recent version has an improved version of `count_submatrices` that has
+been accelerated a lot by a small change. The reported timings above are for an 
+earier version of the implementation.
