@@ -90,6 +90,13 @@ mod tests {
     }
 
     #[test]
+    fn test_count_submatrices_edge1() {
+        let nums = vec![vec![10], vec![5]];
+        let result = count_submatrices(nums, 5);
+        assert_eq!(result, 0);
+    }
+
+    #[test]
     fn test_count_submatrices_ref() {
         let nums = vec![vec![7, 6, 3], vec![6, 6, 1]];
         let result = count_submatrices_ref(&nums, 18);
