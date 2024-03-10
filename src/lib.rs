@@ -4,25 +4,26 @@ use std::vec;
 
 pub fn count_submatrices(grid: Vec<Vec<i32>>, k: i32) -> i32 {
     let n = grid.first().unwrap().len();
-    grid.into_iter()
+    grid.iter()
         .map(|row| {
-            row.into_iter().scan(0, |acc, x| {
+            row.iter().scan(0, |acc, x| {
                 *acc += x;
                 Some(*acc)
             })
         })
         .scan(vec![0; n], |acc, row| {
             Some(
-                acc.into_iter()
+                acc.iter_mut()
                     .zip(row)
-                    .map(|(x, y)| {
-                        *x += y;
-                        *x
+                    .map(|(a, r)| {
+                        *a += r;
+                        *a
                     })
-                    .take_while(|&x| x <= k)
+                    .take_while(|&e| e <= k)
                     .count() as i32,
             )
         })
+        .take_while(|&count_from_row| count_from_row > 0)
         .sum::<i32>()
 }
 
@@ -37,16 +38,17 @@ pub fn count_submatrices_ref(grid: &Vec<Vec<i32>>, k: i32) -> i32 {
         })
         .scan(vec![0; n], |acc, row| {
             Some(
-                acc.into_iter()
+                acc.iter_mut()
                     .zip(row)
-                    .map(|(x, y)| {
-                        *x += y;
-                        *x
+                    .map(|(a, r)| {
+                        *a += r;
+                        *a
                     })
-                    .take_while(|&x| x <= k)
+                    .take_while(|&e| e <= k)
                     .count() as i32,
             )
         })
+        .take_while(|&count_from_row| count_from_row > 0)
         .sum::<i32>()
 }
 
@@ -76,6 +78,8 @@ pub fn count_submatrices_fastest(mut grid: Vec<Vec<i32>>, k: i32) -> i32 {
 #[cfg(test)]
 mod tests {
     use std::vec;
+
+    use test_utils::generate_test_grid;
 
     use super::*;
 
@@ -115,4 +119,23 @@ mod tests {
         let result = count_submatrices_fastest(nums, 20);
         assert_eq!(result, 6);
     }
+
+    #[test]
+    fn test_implementations_with_big_grid() {
+        let (grid, k) = generate_test_grid();
+
+        println!("k: {}", k);
+        println!("number of submatrices: {}", count_submatrices_ref(&grid, k));
+        assert_eq!(
+            count_submatrices_ref(&grid, k),
+            count_submatrices_fastest(grid.clone(), k)
+        );
+        assert_eq!(
+            count_submatrices_ref(&grid, k),
+            count_submatrices(grid.clone(), k)
+        );
+    }
+
+
 }
+
