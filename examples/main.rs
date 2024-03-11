@@ -26,7 +26,11 @@ fn main() {
         let rgb: palette::Srgb =
             palette::Hsv::new((sum as f32 / max_sum as f32) * 360.0, 1.0, 1.0).into_color();
         let (red, green, blue) = rgb.into_format::<u8>().into_components();
-        draw_filled_rect_mut( &mut img, Rect::at(0, 0).of_size(x as u32 + 1, y as u32 + 1), Rgb([red, green, blue]));
+        draw_filled_rect_mut(
+            &mut img,
+            Rect::at(0, 0).of_size(x as u32 + 1, y as u32 + 1),
+            Rgb([red, green, blue]),
+        );
     }
 
     img.save("test.png").unwrap();
