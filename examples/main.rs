@@ -24,15 +24,24 @@ fn main() {
 
     let mut img = RgbImage::new((max_x) as u32, (max_y) as u32);
 
-    submatrices.sort_by_key(|(sum, _, _)| *sum ); // Sort by submatrix sum
-                                                        // so that the smallest 
-                                                        // submatrices are drawn last.
+    submatrices.sort_by_key(|(sum, _, _)| *sum); // Sort by submatrix sum
+                                                 // so that the smallest
+                                                 // submatrices are drawn last.
 
     for (sum, x, y) in submatrices.into_iter().rev() {
         // Map the sum to a color on the rainbow.
-        // Note that as hsv is a circle over all colors, the lowest value is red, 
-        // and the highest is red again. But we can't see ulraviolet anyway (and
-        // luckily monitors won't display it either).
+        //
+        // Note that as hsv is a circle over all colors, the lowest value is red,
+        // and the highest is red again. But we can't see ultraviolet anyway (and
+        // luckily monitors won't display it either - but they did display infrared
+        // in the ancient days, when we all programmed 16-bit systems with C or Pascal
+        // or BASIC and dinosaurs roamed the earth). If you don't want red to
+        // reappear, try change 360.0 to 359.0 or an even lower value. Or choose
+        // a different color space. You may try to play with hsl and lower the
+        // luminance to get to black approaching the end of the circle (as that
+        // would be what we see from a surface emitting ultraviolet only). But
+        // that is not a linear transformation, so it's not as easy as it sounds.
+
         let (red, green, blue) =
             Srgb::from_color(Hsv::new((sum as f32 / max_sum as f32) * 360.0, 1.0, 1.0))
                 .into_format::<u8>()
