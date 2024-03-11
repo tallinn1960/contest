@@ -19,7 +19,7 @@ same algorithm consuming a 1000x1000 field.
 
 - *mine/ref*
 
-some implementation of the algorithm, same input, but input is passed as reference.
+same implementation of the algorithm, same input, but input is passed as reference.
 Appears to be considerably faster.
 
 - *mine/fs*
@@ -39,7 +39,7 @@ faster than *leetcode/cs*
 
 - *leetcode/cs_raw_ptr*
 
-unsafe as _leetcode/cs_, bet using raw ptr access. Surprisingly no gain in performance
+unsafe as *leetcode/cs_unchecked*, but using raw ptr access. Surprisingly no gain in performance
 compared to _leetcode/cs_.
 
 All functions are measured with exactly the same input. Run the benchmarks with
