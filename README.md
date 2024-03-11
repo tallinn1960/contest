@@ -57,3 +57,13 @@ To get reliable results consistent on all platforms one needs to increase the
 dataset input size (assuming that runtime depends on it) to take the execution
 time of one function call near or into the range of ms.
 
+# Acknowledgements
+
+*patryk27* on *Reddit* for helping me figuring out misleading performance measurements
+on different platforms.
+
+*dacozai* on *leetcode* for the contribution of algorithm versions using indices.
+
+# Further reading
+
+The *mine/cs* solution and why it is the fastest is explained in detail on [leetcode](https://leetcode.com/problems/count-submatrices-with-top-left-element-and-sum-less-than-k/solutions/4849239/the-return-of-the-iterators-or-why-it-is-good-to-be-lazy).
