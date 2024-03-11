@@ -1,6 +1,6 @@
 #![allow(missing_docs)]
 
-use contest::{count_submatrices, count_submatrices_fastest, count_submatrices_raw_ptr, count_submatrices_ref, count_submatrices_unchecked};
+use contest::{count_submatrices, count_submatrices_fastest, count_submatrices_raw_ptr, count_submatrices_ref, count_submatrices_unchecked, find_submatrices};
 use criterion::{criterion_group, criterion_main, Criterion};
 use test_utils::generate_test_grid;
 
@@ -34,6 +34,12 @@ fn count_submatrices_benchmark(c: &mut Criterion) {
     group.bench_function("mine/ref", |b| {
         b.iter(|| count_submatrices_ref(&grid, k))
     });
+
+    group.bench_function("mine/fs", |b| {
+        b.iter(|| find_submatrices(&grid, k))
+
+    });
+
     group.bench_function("leetcode/cs", |b| {
         b.iter_batched(
             || grid.clone(),
