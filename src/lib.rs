@@ -27,6 +27,33 @@ pub fn count_submatrices(grid: Vec<Vec<i32>>, k: i32) -> i32 {
         .sum::<i32>()
 }
 
+pub fn find_submatrices(grid: &Vec<Vec<i32>>, k: i32) -> Vec<(i32, usize, usize)> {
+    let n = grid.first().unwrap().len();
+    grid.iter()
+        .map(|row| {
+            row.iter().scan(0, |acc, x| {
+                *acc += x;
+                Some(*acc)
+            })
+        })
+        .enumerate()
+        .scan(vec![0; n], |acc, row| {
+            Some(
+                acc.iter_mut()
+                    .zip(row.1)
+                    .enumerate()
+                    .map(|(x, (a, r))| {
+                        *a += r;
+                        (*a, x, row.0)
+                    })
+                    .take_while(|&e| e.0 <= k)
+                    .collect::<Vec<(i32, usize, usize)>>()
+            )
+        })
+        .flatten()
+        .collect::<Vec<_>>()
+}
+
 pub fn count_submatrices_ref(grid: &Vec<Vec<i32>>, k: i32) -> i32 {
     let n = grid.first().unwrap().len();
     grid.iter()
@@ -72,6 +99,75 @@ pub fn count_submatrices_fastest(mut grid: Vec<Vec<i32>>, k: i32) -> i32 {
         }
     }
 
+    ans
+}
+
+#[allow(unsafe_code)]
+pub fn count_submatrices_unchecked(mut grid: Vec<Vec<i32>>, k: i32) -> i32 {
+    for i in 0..grid.len() {
+        unsafe {
+            let row = grid.get_mut(i).unwrap();
+            let row_ptr = row.as_mut_ptr();
+            for j in 1..grid[i].len() {
+                *row_ptr.add(j) += *row_ptr.add(j-1);
+            }
+        }
+    }
+
+    let mut ans = 0i32;
+    for c in 0..grid[0].len() {
+        let mut sumup = 0i32;
+        for r in 0..grid.len() {
+            unsafe {
+                let row = grid.get_mut(r).unwrap();
+                let row_ptr = row.as_mut_ptr();
+                sumup += *row_ptr.add(c);
+                if sumup <= k {
+                    ans += 1;
+                } else {
+                    break;
+                }
+            }
+        }
+    }
+
+    ans
+}
+
+#[allow(unsafe_code)]
+pub fn count_submatrices_raw_ptr(mut grid: Vec<Vec<i32>>, k: i32) -> i32 {
+    let row_len = grid.len();
+    let col_len = grid[0].len();
+    let vv = grid.as_mut_ptr();
+
+    for i in 0..row_len {
+        unsafe {
+            let row_ptr = vv.add(i).as_mut().unwrap();
+            for j in 1..col_len {
+                let val_ptr = row_ptr.as_mut_ptr(); 
+                *val_ptr.add(j) += *val_ptr.add(j-1);
+            }
+        }
+    }    
+
+
+    let mut ans = 0i32;
+    for c in 0..col_len {
+        let mut sumup = 0i32;
+        for r in 0..row_len {
+            unsafe {
+                let row_ptr = vv.add(r).as_mut().unwrap();
+                let val_ptr = row_ptr.as_mut_ptr();
+                sumup += *val_ptr.add(c);
+            }
+            if sumup <= k {
+                ans += 1;
+            } else {
+                break;
+            }
+        }
+    }
+    
     ans
 }
 
@@ -135,7 +231,4 @@ mod tests {
             count_submatrices(grid.clone(), k)
         );
     }
-
-
 }
-
