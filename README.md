@@ -10,7 +10,7 @@ all do the same on the same input (calculation numbers of submatrices):
 
 - *mine/cs* 
 
-consumes an 500x500 Vec<Vec<i32>> field with random integers and a sufficiently
+consumes an 500x500 `Vec<Vec<i32>>` field with random integers and a sufficiently
 large submatrix sum limit to finde a substantial amount of submatrices.
 
 - *mine/cs1000x1000*
@@ -24,8 +24,8 @@ Appears to be considerably faster.
 
 - *mine/fs*
 
-a variant of the algorithm producing a list of submatrices containing their sum and
-the x,y position of the lower end corner of the submatrix. _example/main_ contains
+a variant of the algorithm producing a list of submatrices containing their *sum* and
+the *x, y* position of the lower right end corner of the submatrix. _example/main_ contains
 an example program visualising the output as a png image file.
 
 - *leetcode/cs*
@@ -35,7 +35,7 @@ the fastest solution for computing submatrices I found on leetcode, consumes its
 - *leetcode/cs_unchecked*
 
 an unsafe version of _leetcode/cs_ that uses unchecked indexed vector access, much 
-faster than leetcode/cs
+faster than *leetcode/cs*
 
 - *leetcode/cs_raw_ptr*
 
@@ -52,10 +52,13 @@ Individual benchmark can be run in isolation by giving cargo bench their name.
 
 # Note
 In developing this repo, it was found that Criterion produces unreliable 
-results if the functions tested have a runtime in the range of µs or lower.
+results if the functions tested have a runtime in the range of a few µs or lower.
 To get reliable results consistent on all platforms one needs to increase the
 dataset input size (assuming that runtime depends on it) to take the execution
-time of one function call near or into the range of ms.
+time of one function call near or into the range of about 100 µs or higher. This
+may as well depend on the machine you are using for testing. But no implementation
+has a built-in limit for input dataset size and should work with all sizes, as
+long as no `i32` sum overflow happens.
 
 # Acknowledgements
 
