@@ -24,23 +24,30 @@ use std::vec;
 /// assert_eq!(result, 6);
 /// ```
 pub fn count_submatrices(grid: Vec<Vec<i32>>, k: i32) -> i32 {
+    count_submatrices_ref(&grid, k)
+}
+
+/// Ref version of count_submatrices
+#[inline]
+pub fn count_submatrices_ref(grid: &[Vec<i32>], k: i32) -> i32 {
     let n = grid.first().unwrap().len();
     grid.iter()
         .map(|row| {
-            row.iter().scan(0, |acc, x| {
-                *acc += x;
-                Some(*acc)
+            row.iter().scan(0, |left_prefix_sum, x| {
+                *left_prefix_sum += x;
+                Some(*left_prefix_sum)
             })
         })
-        .scan(vec![0; n], |acc, row| {
+        .scan(vec![0; n], |submatrix_sums, row| {
             Some(
-                acc.iter_mut()
+                submatrix_sums
+                    .iter_mut()
                     .zip(row)
-                    .map(|(a, r)| {
-                        *a += r;
-                        *a
+                    .map(|(submatrix_sum, r)| {
+                        *submatrix_sum += r;
+                        *submatrix_sum
                     })
-                    .take_while(|&e| e <= k)
+                    .take_while(|&submatrix_sum| submatrix_sum <= k)
                     .count() as i32,
             )
         })
@@ -72,26 +79,27 @@ pub fn count_submatrices(grid: Vec<Vec<i32>>, k: i32) -> i32 {
 /// let result = find_submatrices(&nums, 20);
 /// assert_eq!(result, vec![(7, 0, 0), (9, 1, 0), (18, 2, 0), (8, 0, 1), (15, 1, 1), (10, 0, 2)]);
 /// ```
-pub fn find_submatrices(grid: &Vec<Vec<i32>>, k: i32) -> Vec<(i32, usize, usize)> {
+pub fn find_submatrices(grid: &[Vec<i32>], k: i32) -> Vec<(i32, usize, usize)> {
     let n = grid.first().unwrap().len();
     grid.iter()
         .map(|row| {
-            row.iter().scan(0, |acc, e| {
-                *acc += e;
-                Some(*acc)
+            row.iter().scan(0, |left_prefix_sum, e| {
+                *left_prefix_sum += e;
+                Some(*left_prefix_sum)
             })
         })
         .enumerate()
-        .scan(vec![0; n], |acc, (y, row)| {
+        .scan(vec![0; n], |submatrix_sums, (y, row)| {
             Some(
-                acc.iter_mut()
+                submatrix_sums
+                    .iter_mut()
                     .zip(row)
                     .enumerate()
-                    .map(|(x, (a, r))| {
-                        *a += r;
-                        (*a, x, y)
+                    .map(|(x, (submatrix_sum, r))| {
+                        *submatrix_sum += r;
+                        (*submatrix_sum, x, y)
                     })
-                    .take_while(|(sum, _, _)| *sum <= k)
+                    .take_while(|(submatrix_sum, _, _)| *submatrix_sum <= k)
                     .collect::<Vec<_>>(),
             )
         })
@@ -100,45 +108,19 @@ pub fn find_submatrices(grid: &Vec<Vec<i32>>, k: i32) -> Vec<(i32, usize, usize)
         .collect()
 }
 
-/// Ref version of count_submatrices
-pub fn count_submatrices_ref(grid: &Vec<Vec<i32>>, k: i32) -> i32 {
-    let n = grid.first().unwrap().len();
-    grid.iter()
-        .map(|row| {
-            row.iter().scan(0, |acc, x| {
-                *acc += x;
-                Some(*acc)
-            })
-        })
-        .scan(vec![0; n], |acc, row| {
-            Some(
-                acc.iter_mut()
-                    .zip(row)
-                    .map(|(a, r)| {
-                        *a += r;
-                        *a
-                    })
-                    .take_while(|&e| e <= k)
-                    .count() as i32,
-            )
-        })
-        .take_while(|&count_from_row| count_from_row > 0)
-        .sum::<i32>()
-}
-
 /// Fastest version of count_submatrices from leetcode
 pub fn count_submatrices_fastest(mut grid: Vec<Vec<i32>>, k: i32) -> i32 {
     let mut ans = 0i32;
-    for i in 0..grid.len() {
-        for j in 1..grid[i].len() {
-            grid[i][j] += grid[i][j - 1];
+    for i in &mut grid {
+        for j in 1..i.len() {
+            i[j] += i[j - 1];
         }
     }
 
     for c in 0..grid[0].len() {
         let mut sumup = 0i32;
-        for r in 0..grid.len() {
-            sumup += grid[r][c];
+        for r in &grid {
+            sumup += r[c];
             if sumup <= k {
                 ans += 1;
             } else {
