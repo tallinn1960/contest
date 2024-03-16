@@ -1,25 +1,53 @@
-#![allow(missing_docs)]
+//! # Submatrices with Sum Less Than K
 
 use std::vec;
 
+/// Given a non-empty 2D matrix grid of non-negative integers `grid`, an integer `k`,
+/// find the maximum number of submatrices such that the sum of the elements
+/// inside the submatrix is less than or equal to `k`.
+///
+/// ## Constraints
+/// * `0 <= grid[i][j] <= 1000`
+/// * `0 <= k <= 10^6`
+///
+/// ## Examples
+///
+/// ```rust
+/// use contest::count_submatrices;
+///
+/// let nums = vec![vec![7, 6, 3], vec![6, 6, 1]];
+/// let result = count_submatrices(nums, 18);
+/// assert_eq!(result, 4);
+///
+/// let nums = vec![vec![7, 2, 9], vec![1, 5, 0], vec![2, 6, 6]];
+/// let result = count_submatrices(nums, 20);
+/// assert_eq!(result, 6);
+/// ```
 pub fn count_submatrices(grid: Vec<Vec<i32>>, k: i32) -> i32 {
+    count_submatrices_ref(&grid, k)
+}
+
+/// Ref version of count_submatrices
+#[inline]
+pub fn count_submatrices_ref(grid: &[Vec<i32>], k: i32) -> i32 {
     let n = grid.first().unwrap().len();
     grid.iter()
         .map(|row| {
-            row.iter().scan(0, |acc, x| {
-                *acc += x;
-                Some(*acc)
+            row.iter().scan(0, |left_prefix_sum, x| {
+                *left_prefix_sum += x;
+                Some(*left_prefix_sum)
             })
         })
-        .scan(vec![0; n], |acc, row| {
+        .scan(vec![0; n], |submatrix_sums, row| {
             Some(
-                acc.iter_mut()
+                submatrix_sums
+                    .iter_mut()
                     .zip(row)
-                    .map(|(a, r)| {
-                        *a += r;
-                        *a
+                    .map(|(submatrix_sum, r)| {
+                        *submatrix_sum += r;
+                        *submatrix_sum
                     })
-                    .take_while(|&e| e <= k)
+                    .take_while(|&submatrix_sum| submatrix_sum <= k)
                     .count() as i32,
             )
         })
@@ -27,70 +55,72 @@ pub fn count_submatrices(grid: Vec<Vec<i32>>, k: i32) -> i32 {
         .sum::<i32>()
 }
 
-pub fn find_submatrices(grid: &Vec<Vec<i32>>, k: i32) -> Vec<(i32, usize, usize)> {
+/// Given a non-empty 2D matrix grid of non-negative integers `grid`, an integer `k`,
+/// find the submatrices such that the sum of the elements inside the submatrix is
+/// less than or equal to `k`. Return the sum of the submatrices, the x and y coordinates
+/// of the lower right corner of the submatrix. All submatrices have their upper left
+/// corner at (0, 0).
+///
+/// ## Constraints
+///
+/// * `0 <= grid[i][j] <= 1000`
+/// * `0 <= k <= 10^6`
+///
+/// ## Examples
+///
+/// ```rust
+/// use contest::find_submatrices;
+///
+/// let nums = vec![vec![7, 6, 3], vec![6, 6, 1]];
+/// let result = find_submatrices(&nums, 18);
+/// assert_eq!(result, vec![(7, 0, 0), (13, 1, 0), (16, 2, 0), (13, 0, 1)]);
+///
+/// let nums = vec![vec![7, 2, 9], vec![1, 5, 0], vec![2, 6, 6]];
+/// let result = find_submatrices(&nums, 20);
+/// assert_eq!(result, vec![(7, 0, 0), (9, 1, 0), (18, 2, 0), (8, 0, 1), (15, 1, 1), (10, 0, 2)]);
+/// ```
+pub fn find_submatrices(grid: &[Vec<i32>], k: i32) -> Vec<(i32, usize, usize)> {
     let n = grid.first().unwrap().len();
     grid.iter()
         .map(|row| {
-            row.iter().scan(0, |acc, x| {
-                *acc += x;
-                Some(*acc)
+            row.iter().scan(0, |left_prefix_sum, e| {
+                *left_prefix_sum += e;
+                Some(*left_prefix_sum)
             })
         })
         .enumerate()
-        .scan(vec![0; n], |acc, row| {
+        .scan(vec![0; n], |submatrix_sums, (y, row)| {
             Some(
-                acc.iter_mut()
-                    .zip(row.1)
-                    .enumerate()
-                    .map(|(x, (a, r))| {
-                        *a += r;
-                        (*a, x, row.0)
-                    })
-                    .take_while(|&e| e.0 <= k)
-                    .collect::<Vec<(i32, usize, usize)>>()
-            )
-        })
-        .flatten()
-        .collect::<Vec<_>>()
-}
-
-pub fn count_submatrices_ref(grid: &Vec<Vec<i32>>, k: i32) -> i32 {
-    let n = grid.first().unwrap().len();
-    grid.iter()
-        .map(|row| {
-            row.iter().scan(0, |acc, x| {
-                *acc += x;
-                Some(*acc)
-            })
-        })
-        .scan(vec![0; n], |acc, row| {
-            Some(
-                acc.iter_mut()
+                submatrix_sums
+                    .iter_mut()
                     .zip(row)
-                    .map(|(a, r)| {
-                        *a += r;
-                        *a
+                    .enumerate()
+                    .map(|(x, (submatrix_sum, r))| {
+                        *submatrix_sum += r;
+                        (*submatrix_sum, x, y)
                     })
-                    .take_while(|&e| e <= k)
-                    .count() as i32,
+                    .take_while(|(submatrix_sum, _, _)| *submatrix_sum <= k)
+                    .collect::<Vec<_>>(),
             )
         })
-        .take_while(|&count_from_row| count_from_row > 0)
-        .sum::<i32>()
+        .take_while(|submatrices_in_row| !submatrices_in_row.is_empty())
+        .flatten()
+        .collect()
 }
 
+/// Fastest version of count_submatrices from leetcode
 pub fn count_submatrices_fastest(mut grid: Vec<Vec<i32>>, k: i32) -> i32 {
     let mut ans = 0i32;
-    for i in 0..grid.len() {
-        for j in 1..grid[i].len() {
-            grid[i][j] += grid[i][j - 1];
+    for i in &mut grid {
+        for j in 1..i.len() {
+            i[j] += i[j - 1];
         }
     }
 
     for c in 0..grid[0].len() {
         let mut sumup = 0i32;
-        for r in 0..grid.len() {
-            sumup += grid[r][c];
+        for r in &grid {
+            sumup += r[c];
             if sumup <= k {
                 ans += 1;
             } else {
@@ -103,13 +133,14 @@ pub fn count_submatrices_fastest(mut grid: Vec<Vec<i32>>, k: i32) -> i32 {
 }
 
 #[allow(unsafe_code)]
+/// Unsafe version of count_submatrices from leetcode
 pub fn count_submatrices_unchecked(mut grid: Vec<Vec<i32>>, k: i32) -> i32 {
     for i in 0..grid.len() {
         unsafe {
             let row = grid.get_mut(i).unwrap();
             let row_ptr = row.as_mut_ptr();
             for j in 1..grid[i].len() {
-                *row_ptr.add(j) += *row_ptr.add(j-1);
+                *row_ptr.add(j) += *row_ptr.add(j - 1);
             }
         }
     }
@@ -135,6 +166,7 @@ pub fn count_submatrices_unchecked(mut grid: Vec<Vec<i32>>, k: i32) -> i32 {
 }
 
 #[allow(unsafe_code)]
+/// Raw pointer version of count_submatrices from leetcode
 pub fn count_submatrices_raw_ptr(mut grid: Vec<Vec<i32>>, k: i32) -> i32 {
     let row_len = grid.len();
     let col_len = grid[0].len();
@@ -144,12 +176,11 @@ pub fn count_submatrices_raw_ptr(mut grid: Vec<Vec<i32>>, k: i32) -> i32 {
         unsafe {
             let row_ptr = vv.add(i).as_mut().unwrap();
             for j in 1..col_len {
-                let val_ptr = row_ptr.as_mut_ptr(); 
-                *val_ptr.add(j) += *val_ptr.add(j-1);
+                let val_ptr = row_ptr.as_mut_ptr();
+                *val_ptr.add(j) += *val_ptr.add(j - 1);
             }
         }
-    }    
-
+    }
 
     let mut ans = 0i32;
     for c in 0..col_len {
@@ -167,7 +198,7 @@ pub fn count_submatrices_raw_ptr(mut grid: Vec<Vec<i32>>, k: i32) -> i32 {
             }
         }
     }
-    
+
     ans
 }
 
