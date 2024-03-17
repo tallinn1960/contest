@@ -1,5 +1,3 @@
-workspace = { members = ["test_utils"] }
-
 [package]
 name = "contest"
 version = "0.1.0"
@@ -12,8 +10,8 @@ edition = "2021"
 [dev-dependencies]
 criterion = "0.5.1"
 rand = "0.8.4"
-image = "0.24.0"
-imageproc = "0.23.0"
+image = "0.25.0"
+imageproc = "0.24.0"
 test_utils = { path = "test_utils" }
 palette = "0.7.0"
 [[bench]]
