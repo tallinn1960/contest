@@ -2,3 +2,4 @@
 test.png
 build
 .cache
+.DS_Store
