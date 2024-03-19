@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.10)
+project(count_submatrices CXX)
+set(CMAKE_CXX_STANDARD 23)
+add_library(count_submatrices count_submatrices.cpp)
+find_package(benchmark)
+add_executable(count_submatrices_benchmark count_submatrices_benchmark.cpp)
+target_link_libraries(count_submatrices_benchmark PRIVATE count_submatrices benchmark::benchmark_main)

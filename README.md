@@ -50,6 +50,11 @@ cargo bench
 
 Individual benchmark can be run in isolation by giving cargo bench their name.
 
+# C++ benchmark
+
+There is a c++ variant mimicing the Rust solution and a benchmark using the
+Google benchmark library in the subfolder *cpp*. Build and run it with *cmake* (but make sure to run the benchmark as a release build). On *clang* and Apple Silicon, c++ is still five times slower than the Rust code but rumours has it that llvm isn't as good in optimizing arm64 code yet as it is on other architectures. Note that you need to compare the time of the c++ solution to the *mine/ref* variant of the Rust benchmark, as the c++ solution takes the test data by reference as well.
+
 # Note
 In developing this repo, it was found that Criterion produces unreliable 
 results if the functions tested have a runtime in the range of a few µs or lower.
